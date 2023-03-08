@@ -1,12 +1,13 @@
 // lint will complain about this, adding '/' to the end works in tests
-import punycode from 'punycode/'
+// import punycode from 'punycode/'
 
 // Following works in prod
-// import punycode from 'punycode'
+import punycode from 'punycode'
 import fs from 'fs'
 import { FileBox } from 'file-box'
 import { execSync } from 'child_process'
 import ChatGPT from 'chatgpt-official'
+import * as dotenv from 'dotenv'
 
 const commands = new Map<string, Function>([
   ['punyencode', punyencode],
@@ -16,8 +17,8 @@ const commands = new Map<string, Function>([
   ['chatgpt', chatgpt],
 ])
 
-const auth = JSON.parse(fs.readFileSync('/home/paulhybryant/.cache/quant/.auth.json', 'utf-8'))
-const gptBot = new ChatGPT(auth.chatgpt.api_key)
+export const config = dotenv.config({path: '~/.env'}).parsed ?? {}
+const gptBot = new ChatGPT(config['CHATGPT'] ?? '')
 
 async function chatgpt (args: string[]): Promise<string> {
   return gptBot.ask(args.join(' '))

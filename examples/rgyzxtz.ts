@@ -23,9 +23,10 @@ import { FileBox } from 'file-box'
 import sqlite3 from 'sqlite3'
 import path from 'path'
 import os from 'os'
-import { runCmd, forceRedeem } from './cmds.js'
+import { runCmd, forceRedeem, config } from './cmds.js'
 import cron from 'cron'
 import * as _ from 'lodash'
+import schedule from 'node-schedule'
 
 function onScan (qrcode: string, status: ScanStatus) {
   if (status === ScanStatus.Waiting || status === ScanStatus.Timeout) {
@@ -75,14 +76,41 @@ async function onMessage (this: Wechaty, msg: Message) {
         } else {
           const whitelist = ['黄宇', 'Zhong']
           if (whitelist.includes(msg.talker().name())) {
-            const cmdOutput = await runCmd(`#chatgpt ${msg.text()}`)
-            await msg.say(cmdOutput)
+            if (msg.text() === '?reminders') {
+              const scheduled = Object.entries(schedule.scheduledJobs).map((v, k) => v[0]).join(', ')
+              log.info(scheduled)
+              await msg.say(scheduled)
+              return
+            }
+            if (msg.text().startsWith('remind me') || msg.text().startsWith('提醒我')) {
+              const now = (new Date()).toLocaleString('en-US', {timeZone: 'Asia/Shanghai'})
+              const query=`give me a time string in format like 'Year-Month-Day Hour:Minite:Second' for "${msg.text()}", assuming now is "${now}", just the string, no other words`
+              const cmdOutput = await runCmd(`#chatgpt ${query}`)
+              const dateSchedule = new Date(cmdOutput)
+              if (dateSchedule) {
+                log.info(dateSchedule.toLocaleString())
+                const fn = (msg) => {
+                  const text = msg.text().replace('remind me', '').replace('提醒我', '')
+                  log.info(`Remind ${msg.talker()}: ${text}`)
+                  void remind(msg.talker(), text)
+                  log.info('Reminder sent')
+                }
+                schedule.scheduleJob(msg.text(), dateSchedule, fn.bind(null, msg))
+                await msg.say(`Reminder set at: ${cmdOutput}`)
+              } else {
+                await msg.say(cmdOutput)
+              }
+            } else {
+              const cmdOutput = await runCmd(`#chatgpt ${msg.text()}`)
+              await msg.say(cmdOutput)
+            }
           }
         }
       }
     }
   }
 }
+
 
 /*
 async function roomQrcodeImage (room: Room) {
@@ -170,6 +198,10 @@ const insertMsg = db.prepare('INSERT INTO messages ("talker","to","room","text",
 
 const bot = WechatyBuilder.build({
   name: 'rgyzxtz',
+  puppet: 'wechaty-puppet-padlocal',
+  puppetOptions: {
+    token: config['WECHATY_PADLOCAL'] ?? '',
+  },
   /**
    * How to set Wechaty Puppet Provider:
    *
@@ -211,5 +243,11 @@ async function jsl () {
   await me.say(await forceRedeem([]))
 }
 
+// TODO: Use node-schedule to replace this
 // Monday to Friday at 9:00AM and 16:00PM
 const cronjob = new cron.CronJob('01 00 9,16 * * 1-5', () => { void jsl() }, null, true, 'Asia/Shanghai')
+
+async function remind(who, what) {
+  await who.say(what)
+}
+

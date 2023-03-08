@@ -2,5 +2,6 @@
   "preset": "ts-jest",
   "testMatch": [
     "<rootDir>/__tests__/*.ts"
-  ]
+  ],
+  "extensionsToTreatAsEsm": [".ts"]
 }

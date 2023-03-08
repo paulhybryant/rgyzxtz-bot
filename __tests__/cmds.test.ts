@@ -1,4 +1,4 @@
-import { runCmd } from '../examples/cmds'
+import { runCmd } from '../examples/cmds.js'
 
 describe('Test commands', () => {
   test('Unknown command', () => {
