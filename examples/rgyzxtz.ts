@@ -83,11 +83,11 @@ async function onMessage (this: Wechaty, msg: Message) {
               return
             }
             if (msg.text().startsWith('remind me') || msg.text().startsWith('提醒我')) {
-              const now = (new Date()).toLocaleString('en-US', {timeZone: 'Asia/Shanghai'})
-              const query=`give me a time string in format like 'Year-Month-Day Hour:Minite:Second' for "${msg.text()}", assuming now is "${now}", just the string, no other words`
+              const now = (new Date()).toLocaleString('en-US', { timeZone: 'Asia/Shanghai' })
+              const query = `give me a time string in format like 'Year-Month-Day Hour:Minite:Second' for "${msg.text()}", assuming now is "${now}", just the string, no other words`
               const cmdOutput = await runCmd(`#chatgpt ${query}`)
-              const dateSchedule = new Date(cmdOutput)
-              if (dateSchedule) {
+              if (cmdOutput) {
+                const dateSchedule = new Date(cmdOutput)
                 log.info(dateSchedule.toLocaleString())
                 const fn = (msg) => {
                   const text = msg.text().replace('remind me', '').replace('提醒我', '')
@@ -110,7 +110,6 @@ async function onMessage (this: Wechaty, msg: Message) {
     }
   }
 }
-
 
 /*
 async function roomQrcodeImage (room: Room) {
@@ -247,7 +246,6 @@ async function jsl () {
 // Monday to Friday at 9:00AM and 16:00PM
 const cronjob = new cron.CronJob('01 00 9,16 * * 1-5', () => { void jsl() }, null, true, 'Asia/Shanghai')
 
-async function remind(who, what) {
+async function remind (who: Contact, what: string) {
   await who.say(what)
 }
-

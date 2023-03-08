@@ -1,8 +1,8 @@
 // lint will complain about this, adding '/' to the end works in tests
-// import punycode from 'punycode/'
+import punycode from 'punycode/'
 
 // Following works in prod
-import punycode from 'punycode'
+// import punycode from 'punycode'
 import fs from 'fs'
 import { FileBox } from 'file-box'
 import { execSync } from 'child_process'
@@ -17,7 +17,7 @@ const commands = new Map<string, Function>([
   ['chatgpt', chatgpt],
 ])
 
-export const config = dotenv.config({path: '~/.env'}).parsed ?? {}
+export const config = dotenv.config({ path: '~/.env' }).parsed ?? {}
 const gptBot = new ChatGPT(config['CHATGPT'] ?? '')
 
 async function chatgpt (args: string[]): Promise<string> {
