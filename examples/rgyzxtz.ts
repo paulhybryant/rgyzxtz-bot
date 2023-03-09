@@ -76,30 +76,34 @@ async function onMessage (this: Wechaty, msg: Message) {
         } else {
           const whitelist = ['黄宇', 'Zhong']
           if (whitelist.includes(msg.talker().name())) {
-            if (msg.text() === '?reminders') {
-              const scheduled = Object.entries(schedule.scheduledJobs).map((v, k) => v[0]).join(', ')
+            const text = msg.text()
+            if (text === '?reminders') {
+              const scheduled = Object.entries(schedule.scheduledJobs).map((v, k) => v[0]).join('\n')
               log.info(scheduled)
               await msg.say(scheduled)
               return
             }
-            if (msg.text().startsWith('remind me') || msg.text().startsWith('提醒我')) {
-              const now = (new Date()).toLocaleString('en-US', { timeZone: 'Asia/Shanghai' })
-              const query = `give me a time string in format like 'Year-Month-Day Hour:Minite:Second' for "${msg.text()}", assuming now is "${now}", just the string, no other words`
-              const cmdOutput = await runCmd(`#chatgpt ${query}`)
-              if (cmdOutput) {
-                const dateSchedule = new Date(cmdOutput)
-                log.info(dateSchedule.toLocaleString())
-                const fn = (msg) => {
-                  const text = msg.text().replace('remind me', '').replace('提醒我', '')
-                  log.info(`Remind ${msg.talker()}: ${text}`)
-                  void remind(msg.talker(), text)
-                  log.info('Reminder sent')
-                }
-                schedule.scheduleJob(msg.text(), dateSchedule, fn.bind(null, msg))
-                await msg.say(`Reminder set at: ${cmdOutput}`)
+            if (text.startsWith('remind me') || text.startsWith('提醒我')) {
+              let spec;
+              if (text.includes('every') || text.includes('每')) {
+                const query = `extract a cron spec string from "${text}", give me just the spec string, no other words`
+                spec = await runCmd(`#chatgpt ${query}`)
+                log.info(spec)
               } else {
-                await msg.say(cmdOutput)
+                const now = (new Date()).toLocaleString('en-US', { timeZone: 'Asia/Shanghai' })
+                const query = `give me a time string in format like 'Year-Month-Day Hour:Minite:Second' for "${text}", assuming now is "${now}", just the string, no other words`
+                const cmdOutput = await runCmd(`#chatgpt ${query}`)
+                spec = new Date(cmdOutput)
+                log.info(spec.toLocaleString())
               }
+              const fn = (msg) => {
+                const text = msg.text().replace('remind me', '').replace('提醒我', '')
+                log.info(`Remind ${msg.talker()}: ${text}`)
+                void remind(msg.talker(), text)
+                log.info('Reminder sent')
+              }
+              schedule.scheduleJob(text, spec, fn.bind(null, msg))
+              await msg.say(`Reminder set as: ${spec}`)
             } else {
               const cmdOutput = await runCmd(`#chatgpt ${msg.text()}`)
               await msg.say(cmdOutput)
