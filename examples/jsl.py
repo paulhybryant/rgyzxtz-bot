@@ -17,7 +17,7 @@ def toImg(df: pd.DataFrame, img: str):
 
 
 def toImg2(df: pd.DataFrame, img: str, fill_colors = None):
-    fig = df2img.plot_dataframe(df, fig_size=(1920, 800), tbl_cells=dict(fill_color=fill_colors), show_fig=False)
+    fig = df2img.plot_dataframe(df, fig_size=(1600, None), tbl_cells=dict(fill_color=fill_colors), show_fig=False)
     df2img.save_dataframe(fig=fig, filename=img)
 
 
@@ -37,7 +37,7 @@ try:
         }
     for col in df.reset_index().columns:
         if col in color_generator:
-            column_fill_colors.append(utils.highlight_column(False, df[col], color_generator.get(col)))
+            column_fill_colors.append(utils.highlight_column(False, color_generator.get(col), df[col]))
         else:
             column_fill_colors.append(['white'] * n)
 
