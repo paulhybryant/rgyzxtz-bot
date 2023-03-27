@@ -27,35 +27,39 @@ const commands = new Map<string, Function>([
 export const config = dotenv.config({ path: '~/.env' }).parsed ?? {}
 const gptBot = new ChatGPT(config['CHATGPT'] ?? '')
 
-async function chatgpt (args: string[]): Promise<string> {
+async function chatgpt (mybot: Wechaty, args: string[]): Promise<string> {
   return gptBot.ask(args.join(' '))
 }
 
-async function punyencode (args: string[]): Promise<string> {
+async function punyencode (mybot: Wechaty, args: string[]): Promise<string> {
   return punycode.encode(args.join(' '))
 }
 
-async function findContact (args: string[]): Promise<Contact|null> {
+async function findContact (mybot: Wechaty, args: string[]): Promise<Contact|string> {
   const query = args[0]
-  let result = await this.Contact.find({ name: query })
+  let result = await mybot.Contact.find({ name: query })
   if (result) {
     return result;
   }
-  return await this.Contact.find({ alias: query })
+  result = await mybot.Contact.find({ alias: query })
+  if (result) {
+    return result;
+  }
+  return 'Not found'
 }
 
-async function ls (args: string[]): Promise<string> {
+async function ls (mybot: Wechaty, args: string[]): Promise<string> {
   if (args.length > 0) {
     return fs.readdirSync('__tests__').join('\r\n')
   }
   return fs.readdirSync('upload').join('\r\n')
 }
 
-async function download (file: string): Promise<FileBox> {
+async function download (mybot: Wechaty, file: string): Promise<FileBox> {
   return FileBox.fromFile(`upload/${file}`)
 }
 
-export async function forceRedeem (args: string[]): Promise<string|FileBox> {
+export async function forceRedeem (mybot: Wechaty, args: string[]): Promise<string|FileBox> {
   if (args.length > 0) {
     return execSync('python __tests__/test.py').toString()
   }
@@ -63,12 +67,12 @@ export async function forceRedeem (args: string[]): Promise<string|FileBox> {
   return FileBox.fromFile(`${file}`)
 }
 
-export async function runCmd (msg: string): Promise<string|FileBox|Contact|null> {
+export async function runCmd (mybot: Wechaty, msg: string): Promise<string|FileBox|Contact|null> {
   const args = msg.split(' ')
   if (args.length > 0) {
     const cmd = args[0]!.substring(1)
     if (commands.get(cmd)) {
-      return commands.get(cmd)!(args.slice(1))
+      return commands.get(cmd)!(mybot, args.slice(1))
     } else {
       return `Unknown command: ${cmd}`
     }

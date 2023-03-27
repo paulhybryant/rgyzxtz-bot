@@ -49,7 +49,7 @@ function onLogout (user: Contact) {
   log.info('StarterBot', '%s logout', user)
 }
 
-async function onMessage (this: Wechaty, msg: Message) {
+async function onMessage (msg: Message) {
   if (msg.talker().name() === '日拱一卒') {
     log.info('Self', msg.text())
     return
@@ -71,7 +71,7 @@ async function onMessage (this: Wechaty, msg: Message) {
         log.info('Text', msg.text())
         await msg.forward(me)
         if (msg.text().startsWith('#')) {
-          const cmdOutput = await runCmd(msg.text())
+          const cmdOutput = await runCmd(this, msg.text())
           await msg.say(cmdOutput)
         } else {
           const whitelist = ['黄宇', 'Zhong']
@@ -87,12 +87,12 @@ async function onMessage (this: Wechaty, msg: Message) {
               let spec;
               if (text.includes('every') || text.includes('每')) {
                 const query = `extract a cron spec string from "${text}", give me just the spec string, no other words`
-                spec = await runCmd(`#chatgpt ${query}`)
+                spec = await runCmd(this, `#chatgpt ${query}`)
                 log.info(spec)
               } else {
                 const now = (new Date()).toLocaleString('en-US', { timeZone: 'Asia/Shanghai' })
                 const query = `give me a time string in format like 'Year-Month-Day Hour:Minite:Second' for "${text}", assuming now is "${now}", just the string, no other words`
-                const cmdOutput = await runCmd(`#chatgpt ${query}`)
+                const cmdOutput = await runCmd(this, `#chatgpt ${query}`)
                 spec = new Date(cmdOutput)
                 log.info(spec.toLocaleString())
               }
@@ -105,7 +105,7 @@ async function onMessage (this: Wechaty, msg: Message) {
               schedule.scheduleJob(text, spec, fn.bind(null, msg))
               await msg.say(`Reminder set as: ${spec}`)
             } else {
-              const cmdOutput = await runCmd(`#chatgpt ${msg.text()}`)
+              const cmdOutput = await runCmd(this, `#chatgpt ${msg.text()}`)
               await msg.say(cmdOutput)
             }
           }
@@ -126,18 +126,18 @@ async function roomQrcodeImage (room: Room) {
 */
 
 // handle room messages
-async function handleRoom (wechaty: Wechaty, me: Contact, room: Room, msg: Message) {
+async function handleRoom (mybot: Wechaty, me: Contact, room: Room, msg: Message) {
   try {
     const contact = msg.talker()
     const topic = await room.topic()
-    if (msg.type() === wechaty.Message.Type.RedEnvelope) {
+    if (msg.type() === mybot.Message.Type.RedEnvelope) {
       await me.say(`在"${topic}"里有红包`)
       if (topic.includes('昌乐')) {
-        const zhong = await wechaty.Contact.find({ name: 'Zhong' })
+        const zhong = await mybot.Contact.find({ name: 'Zhong' })
         if (zhong) {
           await zhong.say(`在"${topic}"里有红包`)
         }
-        const laozhongjia = await wechaty.Room.find({ topic: '老钟家' })
+        const laozhongjia = await mybot.Room.find({ topic: '老钟家' })
         if (laozhongjia) {
           await laozhongjia.say(`在"${topic}"里有红包`)
         }
@@ -152,7 +152,7 @@ async function handleRoom (wechaty: Wechaty, me: Contact, room: Room, msg: Messa
     const contacts = ['持有封基', '布衣书生', '站在Ju人肩上', '闲大']
     if (contacts.includes(contact.name())) {
       log.info('Contact', contact.name())
-      if (msg.type() === wechaty.Message.Type.Text) {
+      if (msg.type() === mybot.Message.Type.Text) {
         await me.say(`"${contact.name()}"在"${topic}"说：${msg.text()}`)
       } else {
         await me.say(`"${contact.name()}"在"${topic}"发了一条消息`)
@@ -166,7 +166,7 @@ async function handleRoom (wechaty: Wechaty, me: Contact, room: Room, msg: Messa
   }
 }
 
-async function onReady (this: Wechaty) {
+async function onReady () {
   const me = await this.Contact.find({ name: '黄宇' })
   if (!me) {
     await this.say('Fatal: 没有找到自己.')
