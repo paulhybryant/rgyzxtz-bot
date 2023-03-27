@@ -9,12 +9,19 @@ import { execSync } from 'child_process'
 import ChatGPT from 'chatgpt-official'
 import * as dotenv from 'dotenv'
 
+import {
+  Contact,
+  Wechaty,
+} from 'wechaty'
+
+
 const commands = new Map<string, Function>([
   ['punyencode', punyencode],
   ['ls', ls],
   ['download', download],
   ['forceRedeem', forceRedeem],
   ['chatgpt', chatgpt],
+  ['contact', findContact],
 ])
 
 export const config = dotenv.config({ path: '~/.env' }).parsed ?? {}
@@ -26,6 +33,15 @@ async function chatgpt (args: string[]): Promise<string> {
 
 async function punyencode (args: string[]): Promise<string> {
   return punycode.encode(args.join(' '))
+}
+
+async function findContact (args: string[]): Promise<Contact|null> {
+  const query = args[0]
+  let result = await this.Contact.find({ name: query })
+  if (result) {
+    return result;
+  }
+  return await this.Contact.find({ alias: query })
 }
 
 async function ls (args: string[]): Promise<string> {
@@ -47,7 +63,7 @@ export async function forceRedeem (args: string[]): Promise<string|FileBox> {
   return FileBox.fromFile(`${file}`)
 }
 
-export async function runCmd (msg: string): Promise<string|FileBox> {
+export async function runCmd (msg: string): Promise<string|FileBox|Contact|null> {
   const args = msg.split(' ')
   if (args.length > 0) {
     const cmd = args[0]!.substring(1)
