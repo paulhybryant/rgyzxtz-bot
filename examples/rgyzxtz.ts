@@ -3,9 +3,6 @@
  * Wechaty - Conversational RPA SDK for Chatbot Makers.
  *  - https://github.com/wechaty/wechaty
  */
-// https://stackoverflow.com/a/42817956/1123955
-// https://github.com/motdotla/dotenv/issues/89#issuecomment-587753552
-import 'dotenv/config.js'
 
 import {
   Contact,
@@ -243,7 +240,7 @@ bot.start()
 
 async function jsl () {
   const me = await bot.Contact.find({ name: '黄宇' })
-  await me.say(await forceRedeem([]))
+  await me.say(await forceRedeem(bot, []))
 }
 
 // TODO: Use node-schedule to replace this
