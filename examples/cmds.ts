@@ -1,8 +1,8 @@
 // lint will complain about this, adding '/' to the end works in tests
-// import punycode from 'punycode/'
+import punycode from 'punycode/'
 
 // Following works in prod
-import punycode from 'punycode'
+// import punycode from 'punycode'
 import fs from 'fs'
 import { FileBox } from 'file-box'
 import { execSync } from 'child_process'
@@ -13,7 +13,6 @@ import {
   Contact,
   Wechaty,
 } from 'wechaty'
-
 
 const commands = new Map<string, Function>([
   ['punyencode', punyencode],
@@ -39,11 +38,11 @@ async function findContact (mybot: Wechaty, args: string[]): Promise<Contact|str
   const query = args[0]
   let result = await mybot.Contact.find({ name: query })
   if (result) {
-    return result;
+    return result
   }
   result = await mybot.Contact.find({ alias: query })
   if (result) {
-    return result;
+    return result
   }
   return 'Not found'
 }

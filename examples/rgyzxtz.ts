@@ -81,7 +81,7 @@ async function onMessage (msg: Message) {
               return
             }
             if (text.startsWith('remind me') || text.startsWith('提醒我')) {
-              let spec;
+              let spec
               if (text.includes('every') || text.includes('每')) {
                 const query = `extract a cron spec string from "${text}", give me just the spec string, no other words`
                 spec = await runCmd(this, `#chatgpt ${query}`)
