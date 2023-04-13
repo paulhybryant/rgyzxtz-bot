@@ -240,6 +240,8 @@ bot.start()
 
 async function jsl () {
   const me = await bot.Contact.find({ name: '黄宇' })
+  const now = new Date()
+  await me.say(`Refreshing conbond data at ${now.toLocaleString()}`)
   await me.say(await forceRedeem(bot, []))
 }
 

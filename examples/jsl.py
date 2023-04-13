@@ -12,8 +12,8 @@ def toImg(df: Styler, img: str):
     from mplfonts import use_font
     use_font('Noto Serif CJK SC')
     # cannot use 'chrome' after upgrading chrome, 'matplotlib' produce no color in png
-    # selenuum requires firefox and firefox-geckodriver
-    dfi.export(df, img, table_conversion='selenium')
+    # selenium requires firefox and firefox-geckodriver
+    dfi.export(df, img, table_conversion='chrome')
 
 
 try:
