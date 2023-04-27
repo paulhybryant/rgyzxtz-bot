@@ -71,7 +71,7 @@ async function onMessage (msg: Message) {
           const cmdOutput = await runCmd(this, msg.text())
           await msg.say(cmdOutput)
         } else {
-          const whitelist = ['黄宇', 'Zhong']
+          const whitelist = [ '黄宇', 'Zhong' ]
           if (whitelist.includes(msg.talker().name())) {
             const text = msg.text()
             if (text === '?reminders') {
@@ -146,7 +146,7 @@ async function handleRoom (mybot: Wechaty, me: Contact, room: Room, msg: Message
       await me.say(`${contact.name()}在"${topic}"里@了我：${msg.text()}`)
       return
     }
-    const contacts = ['持有封基', '布衣书生', '站在Ju人肩上', '闲大']
+    const contacts = [ '持有封基', '布衣书生', '站在Ju人肩上', '闲大' ]
     if (contacts.includes(contact.name())) {
       log.info('Contact', contact.name())
       if (msg.type() === mybot.Message.Type.Text) {
