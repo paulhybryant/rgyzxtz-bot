@@ -14,12 +14,12 @@ import {
 } from 'wechaty'
 
 const commands = new Map<string, Function>([
-  ['punyencode', punyencode],
-  ['ls', ls],
-  ['download', download],
-  ['forceRedeem', forceRedeem],
-  ['chatgpt', chatgpt],
-  ['contact', findContact],
+  [ 'punyencode', punyencode ],
+  [ 'ls', ls ],
+  [ 'download', download ],
+  [ 'forceRedeem', forceRedeem ],
+  [ 'chatgpt', chatgpt ],
+  [ 'contact', findContact ],
 ])
 
 export const config = dotenv.config({ path: '~/.env' }).parsed ?? {}
