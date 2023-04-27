@@ -8,23 +8,24 @@ import pathlib
 from pandas.io.formats.style import Styler
 
 
-def toImg(df: Styler, img: str):
-    from mplfonts import use_font
-    use_font('Noto Serif CJK SC')
-    # cannot use 'chrome' after upgrading chrome, 'matplotlib' produce no color in png
-    # selenium requires firefox and firefox-geckodriver
-    dfi.export(df, img, table_conversion='chrome')
+def toImg(img: str, use_plotly: bool):
+    if use_plotly:
+        fig = utils.get_force_redeem(repo, use_plotly)
+        df2img.save_dataframe(fig=fig, filename=img)
+    else:
+        styler = utils.get_force_redeem(repo, use_plotly)
+        from mplfonts import use_font
+        use_font('Noto Serif CJK SC')
+        # 'matplotlib' produce no color in png
+        # selenium requires firefox and firefox-geckodriver
+        dfi.export(styler, img, table_conversion='chrome')
 
 
 try:
-    repo = pathlib.Path('/home/paulhybryant/gitrepo/quant')
+    repo = pathlib.Path('/wechaty/quant')
     img = '/tmp/tmp.png'
 
-    # fig = utils.get_force_redeem(repo, use_plotly=True)
-    # df2img.save_dataframe(fig=fig, filename=img)
-
-    styler = utils.get_force_redeem(repo, use_plotly=False)
-    toImg(styler, img)
+    toImg(img, True)
     utils.notify_image_wechat(img)
     print(img, end='')
 except Exception as e:

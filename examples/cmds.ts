@@ -6,7 +6,6 @@ import punycode from 'punycode/'
 import fs from 'fs'
 import { FileBox } from 'file-box'
 import { execSync } from 'child_process'
-import ChatGPT from 'chatgpt-official'
 import * as dotenv from 'dotenv'
 
 import {
@@ -24,10 +23,9 @@ const commands = new Map<string, Function>([
 ])
 
 export const config = dotenv.config({ path: '~/.env' }).parsed ?? {}
-const gptBot = new ChatGPT(config['CHATGPT'] ?? '')
 
 async function chatgpt (mybot: Wechaty, args: string[]): Promise<string> {
-  return gptBot.ask(args.join(' '))
+  return 'Use http://chatgpt.rgyzxtz.tk'
 }
 
 async function punyencode (mybot: Wechaty, args: string[]): Promise<string> {

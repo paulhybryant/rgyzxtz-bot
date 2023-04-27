@@ -169,11 +169,6 @@ async function onReady () {
     await this.say('Fatal: 没有找到自己.')
     process.exit(1)
   }
-  const zhong = await this.Contact.find({ name: 'Zhong' })
-  if (!zhong) {
-    await this.say('Fatal: 没有找到Zhong.')
-    process.exit(1)
-  }
   await me.say('微信助手就绪')
   // const app = express()
   // app.use(bodyParser.json())
@@ -241,7 +236,6 @@ bot.start()
 async function jsl () {
   const me = await bot.Contact.find({ name: '黄宇' })
   const now = new Date()
-  await me.say(`Refreshing conbond data at ${now.toLocaleString()}`)
   await me.say(await forceRedeem(bot, []))
 }
 
