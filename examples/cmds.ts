@@ -1,5 +1,7 @@
 // lint will complain about this, adding '/' to the end works in tests
-import punycode from 'punycode/'
+// given the explicit file name also works
+// Can also try --experimental-specifier-resolution
+import punycode from 'punycode/punycode.js'
 
 // Following works in prod
 // import punycode from 'punycode'
