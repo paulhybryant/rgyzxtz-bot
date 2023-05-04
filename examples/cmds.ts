@@ -28,17 +28,16 @@ const commands = new Map<string, Function>([
 ])
 
 export const config = dotenv.config({ path: '~/.env' }).parsed ?? {}
-const configuration = new Configuration({apiKey: config['CHATGPT'] ?? ''});
-const openai = new OpenAIApi(configuration);
+const configuration = new Configuration({ apiKey: config['CHATGPT'] ?? '' })
+const openai = new OpenAIApi(configuration)
 const agent = new HttpsProxyAgent('http://rgyzxtz:3128')
-
 
 async function chatgpt (mybot: Wechaty, args: string[]): Promise<string> {
   // return 'Use http://chatgpt.rgyzxtz.tk'
   const completion = await openai.createCompletion(
-    {model: "text-davinci-003", prompt: args.join(' ')},
-    {httpAgent: agent, httpsAgent: agent});
-  return completion.data.choices[0].text;
+    { model: "text-davinci-003", prompt: args.join(' ') },
+    { httpAgent: agent, httpsAgent: agent })
+  return completion.data.choices[0].text
 }
 
 async function punyencode (mybot: Wechaty, args: string[]): Promise<string> {
